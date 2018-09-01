@@ -28,9 +28,9 @@ public class MainActivity extends AppCompatActivity
      * URL for earthquake data from the Guardian dataset
      */
     private static final String REQUEST_URL =
-            "http://content.guardianapis.com/search?from-date=2018-08-01&to-date=2018-09-01&&api-key=" +
+            "http://content.guardianapis.com/search?from-date=2018-08-01&to-date=2018-09-01&api-key=" +
                     API_KEY +
-                    "&show-tags=contributor&page-size=20";
+                    "&show-tags=contributor&page-size=10";
 
     /**
      * Constant for newsLoader ID
@@ -122,6 +122,9 @@ public class MainActivity extends AppCompatActivity
 
         // Set empty state text to display "No news found."
         emptyStateTextView.setText(R.string.no_news);
+
+        //clear adapter for when returning from intent
+        adapter.clear();
 
         // If there is a valid News add them to the adapter's
         if (news != null && !news.isEmpty()) {
