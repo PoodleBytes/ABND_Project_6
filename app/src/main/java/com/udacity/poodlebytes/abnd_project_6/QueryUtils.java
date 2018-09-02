@@ -43,6 +43,11 @@ public final class QueryUtils {
      */
     private static final String TAG = QueryUtils.class.getSimpleName();
 
+    //time-out value for http connections
+    private static final int READ_TIMEOUT = 10000;
+    private static final int CONNECT_TIMEOUT = 15000;
+
+
     /**
      * Empty Constructor
      */
@@ -99,8 +104,8 @@ public final class QueryUtils {
         InputStream inputStream = null;
         try {
             urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setReadTimeout(10000 /* milliseconds */);
-            urlConnection.setConnectTimeout(15000 /* milliseconds */);
+            urlConnection.setReadTimeout(READ_TIMEOUT /* milliseconds */);
+            urlConnection.setConnectTimeout(CONNECT_TIMEOUT /* milliseconds */);
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
 
@@ -165,46 +170,54 @@ public final class QueryUtils {
             // For each news article create a news  object
             for (int i = 0; i < newsArray.length(); i++) {
 
+                String title;
+                String date;
+                String url;
+                String author = "";
+                String category;
+
                 // Get a single article at position i within the JSON array
                 JSONObject currentNews = newsArray.getJSONObject(i);
 
-
-                // Parse JSON values:
+                /* Parse JSON values:*/
                 //article title
-                String title = currentNews.getString("webTitle");
+                title = currentNews.getString("webTitle");
 
                 //date
                 String rawdate = currentNews.getString("webPublicationDate");
                 String[] dateAndTime;
                 dateAndTime = rawdate.split("T");
-                String date = dateAndTime[0];
+                date = dateAndTime[0];
 
                 //article "url"
-                String url = currentNews.getString("webUrl");
+                url = currentNews.getString("webUrl");
 
-                //get author from tags portion of JSON Object
+                /* process  author(s) from tags portion of JSON Object */
                 JSONArray authorArray = currentNews.getJSONArray("tags");
-                JSONObject currentAuthor = authorArray.getJSONObject(0);
-                String authorName = currentAuthor.getString("webTitle");
-                //Concatenation of author name and type of author (pulled from JSON)
-                StringBuilder authorBuilder = new StringBuilder();
-                authorBuilder.append(authorName);
-                Log.i(TAG, "authorName" + authorName);
-                //Check for 2nd author
-                if (authorArray.length() > 1) {
-                    for (int n = 1; n < authorArray.length(); n++) {
-                        JSONObject secondaryAuthor = authorArray.getJSONObject(n);
-                        String secondAuthor = secondaryAuthor.getString("webTitle");
-                        authorBuilder.append(" & ");
-                        authorBuilder.append(secondAuthor);
-                        Log.i(TAG, "secondAuthor " + secondAuthor);
+                String authorName = "";
+                if (authorArray.length() != 0) {
+                    //get author from tags portion of JSON Object
+                    JSONObject currentAuthor = authorArray.getJSONObject(0);
+                    authorName = currentAuthor.getString("webTitle");
+                    //Concatenation of author name and type of author (pulled from JSON)
+                    StringBuilder authorBuilder = new StringBuilder();
+                    authorBuilder.append(authorName);
+                    Log.i(TAG, "authorName" + authorName);
+                    //Check for and append other authors
+                    if (authorArray.length() > 1) {
+                        for (int n = 1; n < authorArray.length(); n++) {
+                            JSONObject secondaryAuthor = authorArray.getJSONObject(n);
+                            String secondAuthor = secondaryAuthor.getString("webTitle");
+                            authorBuilder.append(" & ");
+                            authorBuilder.append(secondAuthor);
+                            Log.i(TAG, "secondAuthor " + secondAuthor);
+                        }
                     }
+                    author = authorBuilder.toString();
                 }
 
-                String author = authorBuilder.toString();
-
                 //article category
-                String category = currentNews.getString("sectionName");
+                category = currentNews.getString("sectionName");
 
                 // Create a news object from the JSON response.
                 News myNews = new News(title, date, url, author, category);

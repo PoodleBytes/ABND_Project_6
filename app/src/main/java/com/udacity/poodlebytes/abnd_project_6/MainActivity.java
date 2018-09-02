@@ -10,6 +10,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -28,7 +29,7 @@ public class MainActivity extends AppCompatActivity
      * URL for earthquake data from the Guardian dataset
      */
     private static final String REQUEST_URL =
-            "http://content.guardianapis.com/search?from-date=2018-08-01&to-date=2018-08-30&api-key=" +
+            "http://content.guardianapis.com/search?from-date=2018-08-01&to-date=2018-09-02&api-key=" +
                     API_KEY +
                     "&show-tags=contributor&page-size=10";
 
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.news_activity);
+        Log.i(TAG, "OnCreate");
 
         ListView newsListView = findViewById(R.id.list);
 
@@ -72,6 +74,7 @@ public class MainActivity extends AppCompatActivity
 
                 // Convert the String URL into a URI object
                 Uri newsUri = Uri.parse(currentNews.getUrl());
+                Log.i(TAG, "URL Clicked:" + newsUri);
 
                 // Create a new intent to view the URL
                 Intent websiteIntent = new Intent(Intent.ACTION_VIEW, newsUri);
@@ -90,6 +93,7 @@ public class MainActivity extends AppCompatActivity
 
         // If there is a network connection, fetch data
         if (networkInfo != null && networkInfo.isConnected()) {
+            Log.i(TAG, "Network OK");
             // Get a reference to the LoaderManager, in order to interact with loaders.
             LoaderManager loaderManager = getLoaderManager();
 
@@ -100,6 +104,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             // Otherwise, display error
             // First, hide loading indicator so error message will be visible
+            Log.i(TAG, "Network Error");
             View loadingIndicator = findViewById(R.id.loading_indicator);
             loadingIndicator.setVisibility(View.GONE);
 
@@ -111,12 +116,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     public Loader<List<News>> onCreateLoader(int i, Bundle bundle) {
         // Create a new loader for the given URL
+        Log.i(TAG, "Start Loader");
         return new NewsLoader(this, REQUEST_URL);
     }
 
     @Override
     public void onLoadFinished(Loader<List<News>> loader, List<News> news) {
         // Hide loading indicator because the data has been loaded
+        Log.i(TAG, "Loader Finished");
         View loadingIndicator = findViewById(R.id.loading_indicator);
         loadingIndicator.setVisibility(View.GONE);
 
