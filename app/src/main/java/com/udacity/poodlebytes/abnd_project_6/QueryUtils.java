@@ -148,7 +148,6 @@ public final class QueryUtils {
     private static List<News> extractFeatureFromJson(String newsJSON) {
         // If the JSON string is empty or null, then return early.
         if (TextUtils.isEmpty(newsJSON)) {
-            Log.i(TAG, "NULL" + newsJSON);
             return null;
         }
 
@@ -190,13 +189,18 @@ public final class QueryUtils {
                 //Concatenation of author name and type of author (pulled from JSON)
                 StringBuilder authorBuilder = new StringBuilder();
                 authorBuilder.append(authorName);
+                Log.i(TAG, "authorName" + authorName);
                 //Check for 2nd author
                 if (authorArray.length() > 1) {
-                    JSONObject secondaryAuthor = authorArray.getJSONObject(1);
-                    String secondAuthor = secondaryAuthor.getString("webTitle");
-                    authorBuilder.append(" & ");
-                    authorBuilder.append(secondAuthor);
+                    for (int n = 1; n < authorArray.length(); n++) {
+                        JSONObject secondaryAuthor = authorArray.getJSONObject(n);
+                        String secondAuthor = secondaryAuthor.getString("webTitle");
+                        authorBuilder.append(" & ");
+                        authorBuilder.append(secondAuthor);
+                        Log.i(TAG, "secondAuthor " + secondAuthor);
+                    }
                 }
+
                 String author = authorBuilder.toString();
 
                 //article category
